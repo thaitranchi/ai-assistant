@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.services.summarize_service import summarize_text
 from app.utils.response import success, error
@@ -7,22 +7,15 @@ from app.utils.response import success, error
 router = APIRouter()
 
 
-# 📥 Request schema (chuẩn hóa input)
 class SummarizeRequest(BaseModel):
     text: str = Field(..., min_length=5, description="Text to summarize")
 
-# 🚀 Endpoint
+
 @router.post("/summarize")
 def summarize(request: Request, body: SummarizeRequest):
-    text = body.text
-
-    # 🔒 Validation
-    if not text or len(text.strip()) < 5:
-        return error("Invalid text. Must be at least 5 characters.")
-
     try:
-        result = summarize_text(text)
+        result = summarize_text(body.text)
         return success(result)
 
     except Exception:
-        return error("Failed to process summarization request.")
+        return error("Failed to summarize text")
