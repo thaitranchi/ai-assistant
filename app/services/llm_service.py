@@ -18,15 +18,18 @@ def gemini_call(prompt: str):
 def fallback_response(prompt: str):
     return f"[Fallback AI] Simulated response: {prompt[:50]}..."
 
+import time
 
 def ask_llm(prompt: str):
-    try:
-        return gemini_call(prompt)
-    except Exception as e:
-        print("Gemini error:", e)
-
+    for attempt in range(3):
         try:
-            return openrouter_call(prompt)
-        except Exception as e2:
-            print("OpenRouter error:", e2)
-            return fallback_response(prompt)
+            return gemini_call(prompt)
+        except Exception as e:
+            print(f"Attempt {attempt+1} failed:", e)
+            time.sleep(2 ** attempt)
+
+    # fallback
+    try:
+        return openrouter_call(prompt)
+    except:
+        return fallback_response(prompt)
