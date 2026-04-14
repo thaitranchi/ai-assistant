@@ -1,26 +1,9 @@
-from fastapi import APIRouter
 from app.services.llm_service import ask_llm
-from slowapi import Limiter
-from slowapi.util import get_remote_address
-from fastapi import Request
+from app.utils.prompt_builder import build_prompt
 
-limiter = Limiter(key_func=get_remote_address)
-router = APIRouter()
-
-def error(msg):
-    return {"status": "error", "message": msg}
-    
-@router.post("/generate")
-@limiter.limit("5/minute")
 def generate_content(topic: str):
-    if not topic or len(topic) < 3:
-        return error("Invalid topic")
-    prompt = f"""
-    Write a short engaging content about:
-
-    {topic}
-
-    Keep it under 120 words.
-    """
-
+    prompt = build_prompt(
+        "Write a short engaging content with title",
+        topic
+    )
     return ask_llm(prompt)
