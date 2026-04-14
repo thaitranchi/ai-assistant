@@ -5,8 +5,9 @@ router = APIRouter()
 
 @router.post("/chat")
 def chat(message: str):
-    messages = [
-        {"role": "system", "content": "You are a helpful AI assistant"},
-        {"role": "user", "content": message}
-    ]
-    return {"response": ask_llm(messages)}
+    prompt = f"""
+    You are a helpful AI assistant.
+
+    User: {message}
+    """
+    return {"response": ask_llm(prompt)}
