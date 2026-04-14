@@ -7,9 +7,14 @@ from fastapi import Request
 limiter = Limiter(key_func=get_remote_address)
 router = APIRouter()
 
+def error(msg):
+    return {"status": "error", "message": msg}
+    
 @router.post("/chat")
 @limiter.limit("5/minute")
 def chat(message: str):
+    if not message or len(message) < 3:
+        return error("Invalid message")
     prompt = f"""
     You are a helpful AI assistant.
 
