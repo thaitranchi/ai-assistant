@@ -22,11 +22,11 @@ def fallback_response(prompt: str):
 def ask_llm(prompt: str):
     try:
         return gemini_call(prompt)
-
     except Exception as e:
-        # 🔥 fallback sang OpenRouter
+        print("Gemini error:", e)
+
         try:
             return openrouter_call(prompt)
-
-        except Exception:
+        except Exception as e2:
+            print("OpenRouter error:", e2)
             return fallback_response(prompt)
