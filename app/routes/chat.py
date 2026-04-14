@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 from app.services.llm_service import ask_llm
 from app.services.summarize_service import summarize_text
 from app.services.generate_service import generate_content
+from app.services.agent_router import route_task
 from app.utils.response import success, error
 
 router = APIRouter()
@@ -12,19 +13,6 @@ router = APIRouter()
 # 📥 Request schema
 class ChatRequest(BaseModel):
     message: str = Field(..., min_length=1)
-
-
-# 🧠 Simple routing logic (AI Agent)
-def route_task(message: str):
-    msg = message.lower()
-
-    if "summarize" in msg:
-        return "summarize"
-    elif "write" in msg or "generate" in msg:
-        return "generate"
-    else:
-        return "chat"
-
 
 # 🚀 Endpoint
 @router.post("/chat")
