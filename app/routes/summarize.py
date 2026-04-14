@@ -9,8 +9,7 @@ router = APIRouter()
 
 # 📥 Request schema (chuẩn hóa input)
 class SummarizeRequest(BaseModel):
-    text: str
-
+    text: str = Field(..., min_length=5, description="Text to summarize")
 
 # 🚀 Endpoint
 @router.post("/summarize")
