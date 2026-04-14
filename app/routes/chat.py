@@ -1,23 +1,64 @@
-from fastapi import APIRouter
-from app.services.llm_service import ask_llm
-from slowapi import Limiter
-from slowapi.util import get_remote_address
-from fastapi import Request
+from fastapi import APIRouter, Request
+from pydantic import BaseModel, Field
 
-limiter = Limiter(key_func=get_remote_address)
+from app.services.llm_service import ask_llm
+from app.services.summarize_service import summarize_text
+from app.services.generate_service import generate_content
+from app.utils.response import success, error
+
 router = APIRouter()
 
-def error(msg):
-    return {"status": "error", "message": msg}
-    
-@router.post("/chat")
-@limiter.limit("5/minute")
-def chat(message: str):
-    if not message or len(message) < 3:
-        return error("Invalid message")
-    prompt = f"""
-    You are a helpful AI assistant.
 
-    User: {message}
-    """
-    return {"response": ask_llm(prompt)}
+# 📥 Request schema
+class ChatRequest(BaseModel):
+    message: str = Field(..., min_length=1)
+
+
+# 🧠 Simple routing logic (AI Agent)
+def route_task(message: str):
+    msg = message.lower()
+
+    if "summarize" in msg:
+        return "summarize"
+    elif "write" in msg or "generate" in msg:
+        return "generate"
+    else:
+        return "chat"
+
+
+# 🚀 Endpoint
+@router.post("/chat")
+def chat(request: Request, body: ChatRequest):
+    message = body.message
+
+    if not message or len(message.strip()) == 0:
+        return error("Message is required")
+
+    try:
+        task = route_task(message)
+
+        if task == "summarize":
+            result = summarize_text(message)
+
+        elif task == "generate":
+            result = generate_content(message)
+
+        else:
+            # Default AI chat
+            prompt = f"""
+You are a helpful AI assistant.
+
+User:
+{message}
+
+Answer clearly and concisely.
+"""
+            result = ask_llm(prompt)
+
+        return success({
+            "task": task,
+            "response": result
+        })
+
+    except Exception:
+        return error("Failed to process chat request")
