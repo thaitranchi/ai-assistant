@@ -18,7 +18,7 @@ def openrouter_call(prompt: str):
         ]
     }
 
-    res = requests.post(url, headers=headers, json=data, timeout=10)
+    res = requests.post(url, json=data, timeout=10)
 
     if res.status_code == 200:
         return res.json()["choices"][0]["message"]["content"]
