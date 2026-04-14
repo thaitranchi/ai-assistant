@@ -28,7 +28,7 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
-def ask_llm(prompt: str):
+async def ask_llm(prompt: str):
     logging.info(f"Input: {prompt[:50]}")
     for attempt in range(3):
         try:
