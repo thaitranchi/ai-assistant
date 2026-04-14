@@ -25,21 +25,26 @@ def fallback_response(prompt: str):
 
 import time
 import logging
+from app.services.llm_openrouter import openrouter_call
 
 logging.basicConfig(level=logging.INFO)
 
-async def ask_llm(prompt: str):
-    logging.info(f"Input: {prompt[:50]}")
+def fallback_response():
+    return "AI service is temporarily unavailable. Please try again later."
+
+
+def ask_llm(prompt: str):
     for attempt in range(3):
         try:
-            return success(gemini_call(prompt))
+            logging.info(f"Calling Gemini, attempt {attempt+1}")
+            return gemini_call(prompt)
         except Exception as e:
-            logging.error("Gemini failed", exc_info=True)
-            print(error(f"Attempt {attempt+1} failed:", e))
+            logging.error(f"Gemini error: {e}")
             time.sleep(2 ** attempt)
 
-    # fallback
     try:
-        return success(openrouter_call(prompt))
-    except:
-        return fallback_response(prompt)
+        logging.info("Fallback to OpenRouter")
+        return openrouter_call(prompt)
+    except Exception as e:
+        logging.error(f"OpenRouter error: {e}")
+        return fallback_response()
