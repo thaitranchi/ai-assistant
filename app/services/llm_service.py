@@ -19,12 +19,17 @@ def fallback_response(prompt: str):
     return f"[Fallback AI] Simulated response: {prompt[:50]}..."
 
 import time
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 def ask_llm(prompt: str):
+    logging.info(f"Input: {prompt[:50]}")
     for attempt in range(3):
         try:
             return gemini_call(prompt)
         except Exception as e:
+            logging.error("Gemini failed", exc_info=True)
             print(f"Attempt {attempt+1} failed:", e)
             time.sleep(2 ** attempt)
 
