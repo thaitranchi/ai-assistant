@@ -2,6 +2,8 @@ import requests
 import os
 
 def openrouter_call(prompt: str):
+    import requests, os
+
     url = "https://openrouter.ai/api/v1/chat/completions"
 
     headers = {
@@ -12,13 +14,13 @@ def openrouter_call(prompt: str):
     data = {
         "model": "openai/gpt-3.5-turbo",
         "messages": [
-            {"role": "user", "content": prompt}
+            {"role": "user", "content": prompt}  # ✅ chỉ 1 message
         ]
     }
 
-    response = requests.post(url, headers=headers, json=data)
+    res = requests.post(url, headers=headers, json=data)
 
-    if response.status_code == 200:
-        return response.json()["choices"][0]["message"]["content"]
+    if res.status_code == 200:
+        return res.json()["choices"][0]["message"]["content"]
     else:
-        raise Exception(response.text)
+        raise Exception(res.text)
