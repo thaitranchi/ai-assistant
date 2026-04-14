@@ -1,21 +1,21 @@
 from fastapi import APIRouter, Request
 from pydantic import BaseModel, Field
 
-from app.services.summarize_service import summarize_text
+from app.services.generate_service import generate_content
 from app.utils.response import success, error
 
 router = APIRouter()
 
 
-class SummarizeRequest(BaseModel):
-    text: str = Field(..., min_length=5, description="Text to summarize")
+class GenerateRequest(BaseModel):
+    topic: str = Field(..., min_length=3, description="Topic to generate content")
 
 
-@router.post("/summarize")
-def summarize(request: Request, body: SummarizeRequest):
+@router.post("/generate")
+def generate(request: Request, body: GenerateRequest):
     try:
-        result = summarize_text(body.text)
+        result = generate_content(body.topic)
         return success(result)
 
     except Exception:
-        return error("Failed to summarize text")
+        return error("Failed to generate content")
