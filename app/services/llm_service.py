@@ -1,14 +1,9 @@
-from openai import OpenAI
+import google.generativeai as genai
 import os
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
-def ask_llm(messages):
-    try:
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=messages
-        )
-        return response.choices[0].message.content
-    except Exception as e:
-        return f"Error: {str(e)}"
+def ask_llm(prompt):
+    model = genai.GenerativeModel("gemini-pro")
+    response = model.generate_content(prompt)
+    return response.text
