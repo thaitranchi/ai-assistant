@@ -1,9 +1,13 @@
-from app.services.llm_service import ask_llm
-from app.utils.prompt_builder import build_prompt
+from fastapi import APIRouter
+from app.services.generate_service import generate_content
+from app.utils.response import success, error
 
-def generate_content(topic: str):
-    prompt = build_prompt(
-        "Write a short engaging content with title",
-        topic
-    )
-    return ask_llm(prompt)
+router = APIRouter()
+
+@router.post("/generate")
+def generate(topic: str):
+    if not topic or len(topic) < 3:
+        return error("Invalid topic")
+
+    result = generate_content(topic)
+    return success(result)
