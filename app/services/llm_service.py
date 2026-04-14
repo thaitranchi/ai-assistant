@@ -14,7 +14,12 @@ def gemini_call(prompt: str):
     )
     return response.text
 
+def success(data):
+    return {"status": "success", "data": data}
 
+def error(msg):
+    return {"status": "error", "message": msg}
+    
 def fallback_response(prompt: str):
     return f"[Fallback AI] Simulated response: {prompt[:50]}..."
 
@@ -27,14 +32,14 @@ def ask_llm(prompt: str):
     logging.info(f"Input: {prompt[:50]}")
     for attempt in range(3):
         try:
-            return gemini_call(prompt)
+            return success(gemini_call(prompt))
         except Exception as e:
             logging.error("Gemini failed", exc_info=True)
-            print(f"Attempt {attempt+1} failed:", e)
+            print(error(f"Attempt {attempt+1} failed:", e))
             time.sleep(2 ** attempt)
 
     # fallback
     try:
-        return openrouter_call(prompt)
+        return success(openrouter_call(prompt))
     except:
         return fallback_response(prompt)
